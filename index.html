@@ -1,16 +1,77 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <title>網站目錄</title>
+  <meta charset="UTF-8">
+  <title>Tim's World</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+
+    /* 全域設定 */
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: #ff00ff;
+      font-family: 'Orbitron', sans-serif;
+      text-align: center;
+      background-attachment: fixed;
+      background-size: cover;
+    }
+
+    /* 標題風格 */
+    h1 {
+      color: #ff00ff;
+      text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff, 0 0 30px #ff00ff;
+      background-color: rgba(0, 0, 0, 0.4);
+      padding: 30px 0;
+      font-size: 3.5em;
+      border-bottom: 2px solid #ff00ff;
+    }
+
+    /* 超連結風格 */
+    a {
+      display: inline-block;
+      margin: 20px;
+      padding: 12px 25px;
+      color: #00ffff;
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 2px solid #00ffff;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 1.2em;
+      transition: all 0.3s ease-in-out;
+      text-shadow: 0 0 5px #00ffff;
+    }
+
+    a:hover {
+      background-color: #ff00ff;
+      color: #000000;
+      box-shadow: 0 0 15px #ff00ff, 0 0 30px #ff00ff;
+      border-color: #ff00ff;
+      text-shadow: none;
+    }
+
+    /* 額外的電流線條動畫背景（選配） */
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: linear-gradient(transparent 96%, rgba(255,255,255,0.05) 97%);
+      background-size: 100% 2px;
+      pointer-events: none;
+      z-index: 1;
+    }
+  </style>
 </head>
 <body>
-    <h1>網站目錄</h1>
-    <ul>
-        <li><a href="TEST1140412.html">自我簡介</a></li>
-        <li><a href="talkroom.html">聊天室</a></li>
-        <li><a href="game.html">小遊戲1</a></li>
-        <li><a href="video.html">看影片</a></li>
-    </ul>
+  <h1>Tim's World</h1>
+
+  <p><a href="https://tingyenlin.github.io/TEST20250410/TEST1140412.html">About Me</a></p>
+  <p><a href="https://tingyenlin.github.io/TEST20250410/talkroom.html">Chat Room</a></p>
+  <p><a href="https://tingyenlin.github.io/TEST20250410/game.html">A Little Game</a></p>
+  <p><a href="https://tingyenlin.github.io/TEST20250410/video.html">Videos</a></p>
 </body>
 </html>
