@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <title>天氣預報 (36 小時)</title>
+  </head>
+  <body>
+    <div>
+      <pre id="mymessage"></pre>
+      <div id="tableContainer">載入中…</div>
+      <h1>未來 36 小時各區天氣預報</h1>
+      <div id="weatherList">載入中…</div>
+    </div>
+    <script>
+      const apiUrl2 = 'http://localhost:8000/api/hello';
+      const mymessage = document.getElementById('mymessage');
+      const weatherList = document.getElementById('weatherList');
+
+      async function loadMessage() {
+        try {
+          const resp = await fetch(apiUrl2);
+          if (!resp.ok) throw new Error('HTTP 錯誤:' + resp.status);
+          const data = await resp.text();
+          if (!data) {
+            weatherList.textContent = '未取得任何資料';
+            return;
+          }
+          mymessage.textContent = data;
+          weatherList.textContent = ''; // 如果不想顯示"載入中"了可以清空
+        } catch (err) {
+          mymessage.textContent = '載入失敗：' + err.message;
+          weatherList.textContent = '';
+        }
+      }
+      //loadMessage();
+
+      const container = document.getElementById('tableContainer');
+	      async function loadTable() {
+	      try {
+	        const resp = await fetch(apiUrl2);
+	        if (!resp.ok) throw new Error(`HTTP 錯誤: ${resp.status}`);
+	        const data = await resp.json();
+	        if (!Array.isArray(data) || data.length === 0) {
+	          container.textContent = '沒有資料';
+	          return;
+	        }
+	        // 產生表格
+	        let table = '<table><thead><tr>';
+	        // 自動產出表頭
+	        const keys = Object.keys(data[0]);
+	        keys.forEach(k => {
+	          table += `<th>${k}</th>`;
+	        });
+	        table += '</tr></thead><tbody>';
+	        // 每一列資料
+	        data.forEach(row => {
+	          table += '<tr>';
+	          keys.forEach(k => {
+	            table += `<td>${row[k]}</td>`;
+	          });
+	          table += '</tr>';
+	        });
+	        table += '</tbody></table>';
+	        container.innerHTML = table;
+	      } catch (err) {
+	        container.textContent = '載入失敗：' + err.message;
+	      }
+	    }
+	    loadTable();
+
+
+    </script>
+  </body>
+</html>

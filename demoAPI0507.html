@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>天氣預報 (36 小時)</title>
+  <style>
+    .hidden {
+      display: none;
+     } 
+    .tab-btn {
+      margin-right: 10px;
+      padding: 6px 12px;
+      cursor: pointer;
+      background-color: #0078D4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }  
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 1em;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+    #tableContainer, #tableContainer2 {
+      margin-bottom: 2em;
+    }
+  </style>
+</head>
+
+<body>
+  <div>
+    <pre id="mymessage"></pre>
+
+    <h1>資料表切換展示</h1>
+    <div>
+      <button class="tab-btn" onclick="showTab('member')">顧客資料</button>
+      <button class="tab-btn" onclick="showTab('orders')">訂單資料</button>
+    </div>
+    <div>
+      <div id="tableContainer" class="hidden">載入中…</div>
+      <div id="tableContainer2" class="hidden">載入中…</div>
+    </div>
+
+    <h1>未來 36 小時各區天氣預報</h1>
+    <div id="weatherList">載入中…</div>
+  </div>
+
+  <script>
+    const apiorders = 'http://localhost:8000/api/orders';
+    const apimember = 'http://localhost:8000/api/member';
+
+    const containerOrders = document.getElementById('tableContainer');
+    const containerCustomers = document.getElementById('tableContainer2');
+
+    async function loadTable(url, todiv) {
+      try {
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error(`HTTP 錯誤: ${resp.status}`);
+        const data = await resp.json();
+        if (!Array.isArray(data) || data.length === 0) {
+          todiv.textContent = '沒有資料';
+          return;
+        }
+
+        let table = '<table><thead><tr>';
+        const keys = Object.keys(data[0]);
+        keys.forEach(k => {
+          table += `<th>${k}</th>`;
+        });
+        table += '</tr></thead><tbody>';
+        data.forEach(row => {
+          table += '<tr>';
+          keys.forEach(k => {
+            table += `<td>${row[k]}</td>`;
+          });
+          table += '</tr>';
+        });
+        table += '</tbody></table>';
+        todiv.innerHTML = table;
+      } catch (err) {
+        todiv.textContent = '載入失敗：' + err.message;
+      }
+    }
+
+    function showTab(name) {
+      if (name === "orders") {
+        containerOrders.style.display = "block";
+        containerCustomers.style.display = "none";
+      } else if (name === "member") {
+        containerOrders.style.display = "none";
+        containerCustomers.style.display = "block";
+      }
+    }
+
+    loadTable(apiorders, containerOrders);
+    loadTable(apimember, containerCustomers);
+    showTab('member'); // 預設顯示顧客資料
+
+    async function loadWeatherData() {
+      const weatherContainer = document.getElementById("weatherList");
+  try {
+    const resp = await fetch('https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=CWB-FE4AD205-4642-40AD-B7FD-336A53D1ED2A');
+    const data = await resp.json();
+
+    const locations = data.records.location;
+    if (!locations || locations.length === 0) {
+      weatherContainer.textContent = '天氣資料載入失敗：沒有預報資料';
+      return;
+    }
+
+    let table = '<table><thead><tr><th>地點</th><th>開始時間</th><th>結束時間</th><th>天氣</th><th>降雨機率</th><th>溫度</th></tr></thead><tbody>';
+
+    locations.forEach(location => {
+      const name = location.locationName;
+
+      const wx = location.weatherElement.find(el => el.elementName === "Wx");
+      const pop = location.weatherElement.find(el => el.elementName === "PoP12h");
+      const temp = location.weatherElement.find(el => el.elementName === "T");
+
+      for (let i = 0; i < 3; i++) { // 前 36 小時通常 3 筆資料
+        table += `<tr>
+          <td>${name}</td>
+          <td>${wx.time[i].startTime}</td>
+          <td>${wx.time[i].endTime}</td>
+          <td>${wx.time[i].parameter.parameterName}</td>
+          <td>${pop.time[i]?.parameter.parameterName || '—'}</td>
+          <td>${temp.time[i]?.parameter.parameterName || '—'}</td>
+        </tr>`;
+      }
+    });
+
+    table += '</tbody></table>';
+    weatherContainer.innerHTML = table;
+
+  } catch (err) {
+    weatherContainer.textContent = '天氣資料載入失敗：' + err.message;
+  }
+}
+  loadWeatherData();
+
+  </script>
+</body>
+</html>
