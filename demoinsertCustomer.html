@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>客戶新增表單</title>
+</head>
+<body>
+  <h2>客戶新增表單</h2>
+  <label for="name">姓名：</label>
+  <input type="text" id="name" name="name">
+  <button onclick="insertpost()">新增</button>
+  <script>
+    function insertpost() {
+      let name = document.getElementById("name").value;
+      if (name) {
+        const data = {
+          table: "customers",
+          name: name
+        };
+
+        fetch('http://localhost:8000/api/2/insert', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+        .then(response => {
+          if (response.ok) {
+            alert("新增成功！");
+          } else {
+            response.text().then(text => {
+              alert("錯誤：" + text);
+            });
+          }
+        })
+        .catch(error => {
+          console.error('發生錯誤:', error);
+          alert("無法連線到伺服器。");
+        });
+      } else {
+        alert("請輸入姓名");
+      }
+    }
+  </script>
+</body>
+</html>

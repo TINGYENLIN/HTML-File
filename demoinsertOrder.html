@@ -6,14 +6,20 @@
 </head>
 <body>
   <h2>新增訂單</h2>
+  
   <label for="pname">商品：</label>
   <select id="pname"></select>
+
   <label for="cname">會員：</label>
   <select id="cname"></select>
+
   <label for="sname">運送者：</label>
   <select id="sname"></select>
-  <label for="num">數量：</label>
-  <input type="text" id="num">
+
+  <!-- 👇 數量欄位已移除 -->
+  <!-- <label for="num">數量：</label>
+  <input type="text" id="num"> -->
+
   <button onclick="insertpost()">新增</button>
 
   <script>
@@ -28,10 +34,21 @@
       try {
         const resp = await fetch(apiCustomer);
         const data = await resp.json();
+
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = "-- 請選擇會員 --";
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        cname.append(defaultOption);
+
         data.forEach(row => {
+          const id = row["idmember"];
+          const name = row["membername"];
           const op = document.createElement("option");
-          op.value = row["idmember"];
-          op.textContent = row["membername"];
+
+          op.value = id;
+          op.textContent = `${id} - ${name}`;
           cname.append(op);
         });
       } catch (err) {
@@ -46,13 +63,22 @@
         const data = await resp.json();
         if (!Array.isArray(data) || data.length === 0) return;
 
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = "-- 請選擇商品 --";
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        pname.append(defaultOption);
+
         data.forEach(row => {
           const id = row["idproduct2"];
           const distance = row["distance"];
+          const weight = row["weight"];
+          const price = row["price"];
           const op = document.createElement("option");
 
           op.value = id;
-          op.textContent = `${id} - ${distance}`; // ⭐ 顯示格式：id - distance
+          op.textContent = `${id} - 長度: ${distance}, 重量: ${weight}, 價格: ${price}`;
           pname.append(op);
         });
       } catch (err) {
@@ -64,14 +90,25 @@
       try {
         const resp = await fetch(apiShipper);
         const data = await resp.json();
+
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = "-- 請選擇運送者 --";
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        sname.append(defaultOption);
+
         data.forEach(row => {
+          const id = row["idemployee"];
+          const name = row["employeeName"];
           const op = document.createElement("option");
-          op.value = row["idemployee"];
-          op.textContent = row["employeeName"];
+
+          op.value = id;
+          op.textContent = `${id} - ${name}`;
           sname.append(op);
         });
       } catch (err) {
-        console.error("運貨者資料載入失敗", err);
+        console.error("運送者資料載入失敗", err);
       }
     }
 
@@ -80,27 +117,31 @@
     snameAdd();
 
     function insertpost() {
-	      //姓名正確的
-	      let pname = document.getElementById("pname").value;
-	      let num= document.getElementById("num").value;     
-	      let cname= document.getElementById("cname").value;
-	      let sname= document.getElementById("sname").value;
-	      
-	      if (pname && num && cname && sname) {
-	        let returnbody= JSON.stringify({ table:"orders", pname: pname,  num:num, cname:cname, sname:sname});
-	        console.log(returnbody);
-	        //格式檢查
-	        fetch('http://localhost:8000/api/2/insert', {
-	          method: 'POST',
-	          mode: 'cors', // ✅ 很關鍵
-	          body: returnbody,
-	        })
-	        console.log("完成fetch")
-	      } else {
-	        alert("請輸入資料");
-	      }
-	    
-	    }
+      const pnameValue = document.getElementById("pname").value;
+      const cnameValue = document.getElementById("cname").value;
+      const snameValue = document.getElementById("sname").value;
+
+      if (pnameValue && cnameValue && snameValue) {
+        const returnbody = JSON.stringify({
+          table: "orders",
+          pname: pnameValue,
+          cname: cnameValue,
+          sname: snameValue
+        });
+
+        console.log(returnbody);
+
+        fetch('http://localhost:8000/api/2/insert', {
+          method: 'POST',
+          mode: 'cors',
+          body: returnbody,
+        });
+
+        console.log("完成fetch");
+      } else {
+        alert("請輸入資料");
+      }
+    }
   </script>
 </body>
 </html>
