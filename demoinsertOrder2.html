@@ -43,10 +43,13 @@
         data.forEach(row => {
           const id = row["idmember"];
           const name = row["membername"];
+          const phone = row["phone"];
           const op = document.createElement("option");
 
           op.value = id;
           op.textContent = `${id} - ${name}`;
+          op.setAttribute("data-name", name);
+          op.setAttribute("data-phone", phone);
           cname.append(op);
         });
       } catch (err) {
@@ -75,13 +78,20 @@
           const length = row["length"];
           const weight = row["weight"];
           const price = row["price"];
+          
+          let weightCategory = parseFloat(weight) >= 10 ? "over 10" : "under 10";
+          const plan = `${distance} | ${length} | ${weightCategory}`;
+
           const op = document.createElement("option");
 
           op.value = id;
           op.setAttribute("data-price", price);
+          op.setAttribute("data-plan", plan);
           op.textContent = `${id} - 距離: ${distance}, 長度: ${length}, 重量: ${weight}, 價格: ${price}`;
+
           pname.append(op);
-        });
+          });
+
       } catch (err) {
         console.error("商品資料載入失敗", err);
         alert("商品資料載入失敗！");
@@ -103,10 +113,14 @@
         data.forEach(row => {
           const id = row["idemployee"];
           const name = row["employeeName"];
+          const ccnum = row["creditcard"];
           const op = document.createElement("option");
 
           op.value = id;
           op.textContent = `${id} - ${name}`;
+          op.setAttribute("data-name", name);
+          op.setAttribute("data-ccnum", ccnum);
+
           sname.append(op);
         });
       } catch (err) {
@@ -131,13 +145,28 @@
       const cnameValue = cname.value;
       const snameValue = sname.value;
 
+      const selectedCustomer = cname.options[cname.selectedIndex];
+      const customerName = selectedCustomer.getAttribute("data-name");
+      const customerPhone = selectedCustomer.getAttribute("data-phone");
+      const selectedShipper = sname.options[sname.selectedIndex];
+      const employeeName = selectedShipper.getAttribute("data-name");
+      const creditCardNumber = selectedShipper.getAttribute("data-ccnum");
+      const selectedProduct = pname.options[pname.selectedIndex];
+      const currentPrice = selectedProduct.getAttribute("data-price");
+      const plan = selectedProduct.getAttribute("data-plan");
+
       if (pnameValue && cnameValue && snameValue) {
         const returnbody = JSON.stringify({
           table: "orders",
           pname: pnameValue,
           cname: cnameValue,
           sname: snameValue,
-          price: currentPrice
+          price: currentPrice,
+          customerName: customerName,
+          customerPhone: customerPhone,
+          employeeName: employeeName,
+          creditCardNumber: creditCardNumber,
+          plan: plan
         });
 
         console.log("送出的資料：", returnbody);
