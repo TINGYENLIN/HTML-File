@@ -122,7 +122,7 @@
       }
 
       const data = {
-        table: "employees",
+        table: "employee",
         employeeName: name,
         employeeGender: gender,
         employeeBirthday: birthday.replace(/-/g, ""), // 轉為 YYYYMMDD
@@ -132,7 +132,7 @@
 
       button.disabled = true;
 
-      fetch('http://localhost:8000/api/employees/insert', {
+      fetch('http://localhost:8000/api/2/insert', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
